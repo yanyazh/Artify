@@ -37,12 +37,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    #Installed dependencies
     'django_extensions',
-    'user.apps.UserConfig',
-
-
     'rest_framework',
     'django_filters',
+
+    #Own apps
+    'user.apps.UserConfig',
+    'post.apps.PostConfig',
+    'event.apps.EventConfig'#,
+    #'auth.apps.AuthConfig'
+
 ]
 
 MIDDLEWARE = [

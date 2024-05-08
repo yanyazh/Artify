@@ -1,4 +1,5 @@
 from django.contrib import admin
+from .models import Follower
 
 # Register your models here.
 
@@ -17,3 +18,4 @@ class CustomUserAdmin(UserAdmin):
     list_display = ['email', 'username',]
 
 admin.site.register(CustomUser, CustomUserAdmin)
+admin.site.register(Follower)
