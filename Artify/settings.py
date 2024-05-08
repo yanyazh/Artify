@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-2k2h09*aao&0)3eq=k5cdz_r9**!8ry6kmxvokfv8a(-=7+v5@'
+SECRET_KEY = 'django-insecure-e!^msqlh@*&$zwphtnxrxzin5sr2q(lkluvs&k5o+kjd7n3&_3'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -37,6 +37,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    #Installed dependencies
+    'django_extensions',
+    'rest_framework',
+    'django_filters',
+
+    #Own apps
+    'user.apps.UserConfig',
+    'post.apps.PostConfig',
+    'event.apps.EventConfig'#,
+    #'auth.apps.AuthConfig'
+
 ]
 
 MIDDLEWARE = [
@@ -48,6 +60,12 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ]
+}
 
 ROOT_URLCONF = 'Artify.urls'
 
@@ -67,8 +85,8 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'Artify.wsgi.application'
 
+AUTH_USER_MODEL = 'user.CustomUser'
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
