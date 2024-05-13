@@ -6,7 +6,7 @@ from django.utils import timezone
 
 class Category(models.Model):
     #Primary key implicit
-    category_name = models.CharField(max_length=50)
+    category_name = models.CharField(max_length=64)
 
     def __str__(self):
         return self.category_name
@@ -14,7 +14,7 @@ class Category(models.Model):
 
 class Tag(models.Model):
     #Primary key implicit
-    tag_name = models.CharField(max_length=50)
+    tag_name = models.CharField(max_length=64)
 
     def __str__(self):
         return self.tag_name
@@ -22,17 +22,18 @@ class Tag(models.Model):
 
 class Post(models.Model):
     #Primary key implicit
-    title = models.CharField(max_length=50)
+    title = models.CharField(max_length=64)
     publish_date = models.DateTimeField(default=timezone.now)
     description = models.TextField(null=True)
     #Foreign Keys:
     user_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     category_id = models.ForeignKey(Category, null=True, on_delete=models.SET_NULL)
     #Many-to-many relations
-    post_tags = models.ManyToManyField(Tag)
+    post_tags = models.ManyToManyField(Tag, blank=True)
 
     def __str__(self):
-        return self.title
+        return f"Post: {self.id} - {self.title}"
+
 
 
 class Comment(models.Model):
@@ -41,6 +42,10 @@ class Comment(models.Model):
     publish_date = models.DateTimeField(default=timezone.now)
     #Foreign Keys:
     post_id = models.ForeignKey(Post, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"Comment: {self.id} - for post: {self.post_id}"
 
 
 class Like(models.Model):
@@ -51,3 +56,6 @@ class Like(models.Model):
     #Composite Primary Key
     class Meta:
         unique_together = ('post_id', 'user_id')
+
+    def __str__(self):
+        return f"Like from user: {self.user_id} - to post: {self.post_id}"

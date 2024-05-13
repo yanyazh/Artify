@@ -19,3 +19,7 @@ class Follower(models.Model):
     #Composite primary key
     class Meta:
         unique_together = ('user_id', 'follower_id')
+
+    def __str__(self):
+        return f"Follow from {self.follower_id} to {self.user_id}"
+        
