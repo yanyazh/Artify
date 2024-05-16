@@ -1,5 +1,5 @@
 from django.db import models
-from user.models import CustomUser
+from user.models import User
 from django.utils import timezone
 
 # Create your models here.
@@ -26,7 +26,7 @@ class Post(models.Model):
     publish_date = models.DateTimeField(default=timezone.now)
     description = models.TextField(null=True)
     #Foreign Keys:
-    user_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
     category_id = models.ForeignKey(Category, null=True, on_delete=models.SET_NULL)
     #Many-to-many relations
     post_tags = models.ManyToManyField(Tag, blank=True)
@@ -42,7 +42,7 @@ class Comment(models.Model):
     publish_date = models.DateTimeField(default=timezone.now)
     #Foreign Keys:
     post_id = models.ForeignKey(Post, on_delete=models.CASCADE)
-    user_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
         return f"Comment: {self.id} - for post: {self.post_id}"
@@ -52,7 +52,7 @@ class Like(models.Model):
     like_date = models.DateTimeField(default=timezone.now)
     #Foreign Keys:
     post_id = models.ForeignKey(Post, on_delete=models.CASCADE)
-    user_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
     #Composite Primary Key
     class Meta:
         unique_together = ('post_id', 'user_id')

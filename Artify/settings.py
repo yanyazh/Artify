@@ -9,12 +9,11 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -27,7 +26,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -38,17 +36,17 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    #Installed dependencies
+    # Installed dependencies
     'django_extensions',
     'rest_framework',
     'django_filters',
     "corsheaders",
 
-    #Own apps
+    # Own apps
     'user.apps.UserConfig',
     'post.apps.PostConfig',
-    'event.apps.EventConfig'#,
-    #'auth.apps.AuthConfig'
+    'event.apps.EventConfig'  # ,
+    # 'auth.apps.AuthConfig'
 
 ]
 
@@ -61,13 +59,19 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    
+
 ]
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
-    ]
+        'rest_framework.authentication.SessionAuthentication',
+
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated'
+    ],
+# Disable Browsable API and Render JSON
+    'DEFAULT_RENDERER_CLASSES':('rest_framework.renderers.JSONRenderer',),
 }
 
 ROOT_URLCONF = 'Artify.urls'
@@ -75,7 +79,7 @@ ROOT_URLCONF = 'Artify.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['auth/templates/account'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -88,8 +92,7 @@ TEMPLATES = [
     },
 ]
 
-
-AUTH_USER_MODEL = 'user.CustomUser'
+AUTH_USER_MODEL = 'user.User'
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
@@ -100,7 +103,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -120,7 +122,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # White listing cors
 
 CORS_ALLOWED_ORIGINS = [
@@ -136,15 +137,27 @@ TIME_ZONE = 'Europe/Warsaw'
 
 USE_I18N = True
 
-USE_TZ = False 
+USE_TZ = False
 
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = 'sharonovnikola1@gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = os.environ.get('EMAIL_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASS')
+EMAIL_USE_TLS = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
 
+
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+SESSION_COOKIE_AGE = 1800
+
+SITE_DOMAIN = 'localhost:8000'
+SITE_NAME = 'Local Host'

@@ -1,5 +1,6 @@
 from django.apps import AppConfig
 
 
-class AuthConfig(AppConfig):
-    name = 'auth'
+class AccountConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'account'
