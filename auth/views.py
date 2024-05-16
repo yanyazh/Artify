@@ -1,5 +1,4 @@
-from django.contrib.auth import authenticate, login, logout
-
+from rest_framework.authentication import TokenAuthentication
 from auth import mybackend
 from user.models import User
 from django.contrib.auth.tokens import default_token_generator
@@ -11,29 +10,26 @@ from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from auth.serializers import UserSerializer
-from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect
-from django.utils.decorators import method_decorator
 from django.conf import settings
+from rest_framework.authtoken.models import Token
 from auth.utils import send_activation_email, send_reset_password_email
 
-@method_decorator(ensure_csrf_cookie, name='dispatch')
-class GetCSRFToken(APIView):
-    permission_classes = [AllowAny]
-    def get(self, request):
-        return Response({'success':'CSRF Cookie Set'})
 
 class CheckAuthenticatedView(APIView):
-    permission_classes=[AllowAny]
+    permission_classes = [AllowAny]
+
     def get(self, request):
         if request.user.is_authenticated:
             return Response({'isAuthenticated': True})
         else:
             return Response({'isAuthenticated': False})
 
+
 class RegistrationView(APIView):
     permission_classes = [AllowAny]
+
     def post(self, request):
-        serializer = UserSerializer(data = request.data)
+        serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.create(serializer.validated_data)
             user.is_active = True
@@ -44,12 +40,14 @@ class RegistrationView(APIView):
             # activation_link = reverse('activate', kwargs={'uid':uid, 'token':token})
             # activation_url = f'{settings.SITE_DOMAIN}{activation_link}'
             # send_activation_email(user.email, activation_url)
-            
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class ActivateView(APIView):
     permission_classes = [AllowAny]
+
 
 class ActivationConfirm(APIView):
     permission_classes = [AllowAny]
@@ -65,7 +63,7 @@ class ActivationConfirm(APIView):
             if default_token_generator.check_token(user, token):
                 if user.is_active:
                     return Response({'detail': 'Account is already activated.'}, status=status.HTTP_200_OK)
- 
+
                 user.is_active = True
                 user.save()
                 return Response({'detail': 'Account activated successfully.'}, status=status.HTTP_200_OK)
@@ -73,38 +71,45 @@ class ActivationConfirm(APIView):
                 return Response({'detail': 'Invalid activation link.'}, status=status.HTTP_400_BAD_REQUEST)
         except User.DoesNotExist:
             return Response({'detail': 'Invalid activation link.'}, status=status.HTTP_400_BAD_REQUEST)
-        
+
 
 class LoginView(APIView):
     permission_classes = [AllowAny]
+    authentication_classes = [TokenAuthentication]
 
     def post(self, request):
-        email = request.data.get('email')
-        password = request.data.get('password')
-        print(email, password)
-
-        user = mybackend.authenticate(email=email, password=password)
-
+        # Your authentication logic here
+        user = mybackend.authenticate(email=request.data['email'], password=request.data['password'])
         if user is not None:
-            if user.is_active:
-                login(request, user)
-                return Response({'detail': 'Logged in successfully.'}, status=status.HTTP_200_OK)
+            # A backend authenticated the credentials
+
+            try:
+                token = Token.objects.get(user_id=user.id)
+
+            except Token.DoesNotExist:
+                token = Token.objects.create(user=user)
+
+            return Response({'token': token.key})
+
         else:
-            return Response({'detail': 'Email or Password is incorrect.'}, status=status.HTTP_400_BAD_REQUEST)
-        
+            # No backend authenticated the credentials
+            return Response([], status=status.HTTP_401_UNAUTHORIZED)
+
+
 class UserDetailView(APIView):
     def get(self, request):
         serializer = UserSerializer(request.user)
         data = serializer.data
         data['is_staff'] = request.user.is_staff
         return Response(data)
-    
+
     def patch(self, request):
         serializer = UserSerializer(request.user, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class ChangePasswordView(APIView):
     def post(self, request):
@@ -124,18 +129,19 @@ class DeleteAccountView(APIView):
     def delete(self, request):
         user = request.user
         user.delete()
-        logout(request)
+
         return Response({'detail': 'Account deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
 
 
 class LogoutView(APIView):
     def post(self, request):
-        logout(request)
+        request.user.auth_token.delete()
         return Response({'detail': 'Logged out successfully.'}, status=status.HTTP_200_OK)
-    
+
 
 class ResetPasswordEmailView(APIView):
-    permission_classes=[AllowAny]
+    permission_classes = [AllowAny]
+
     def post(self, request):
         email = request.data.get('email')
 
@@ -155,12 +161,14 @@ class ResetPasswordEmailView(APIView):
 
         return Response({'detail': 'Password reset email sent successfully.'}, status=status.HTTP_200_OK)
 
+
 class ResetPasswordView(APIView):
     permission_classes = [AllowAny]
 
 
 class ResetPasswordConfirmView(APIView):
-    permission_classes=[AllowAny]
+    permission_classes = [AllowAny]
+
     def post(self, request):
         uid = request.data.get('uid')
         token = request.data.get('token')
