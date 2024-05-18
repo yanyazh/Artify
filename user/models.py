@@ -31,6 +31,7 @@ class UserManager(BaseUserManager):
             password=password,
             name=name,
         )
+        user.is_active = True
         user.is_admin = True
         user.save(using=self._db)
         return user
@@ -43,7 +44,7 @@ class User(AbstractBaseUser):
         unique=True
     )
     name = models.CharField(max_length=255)
-    is_active = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
