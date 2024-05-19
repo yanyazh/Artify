@@ -12,12 +12,13 @@ class PostViewSet(ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
 
-    def create(self, request):
-        print(request.headers)
-        return Response("hello")
+    # def create(self, request):
+    #     print(request.headers)
+    #     return Response("hello")
     
     def get_queryset(self):
-        queryset = Post.objects.all()
+        queryset = Post.objects.all().select_related('user_id') 
+        
         post_id = self.request.query_params.get('id')
         if post_id:
             queryset = queryset.filter(id=post_id)
