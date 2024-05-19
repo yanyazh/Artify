@@ -1,6 +1,7 @@
 from django.db import models
 from user.models import User
 from django.utils import timezone
+import uuid
 
 # Create your models here.
 
@@ -22,6 +23,7 @@ class Tag(models.Model):
 
 class Post(models.Model):
     #Primary key implicit
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=64)
     publish_date = models.DateTimeField(default=timezone.now)
     description = models.TextField(null=True)
