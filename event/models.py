@@ -11,7 +11,7 @@ class Event(models.Model):
     description = models.TextField(null=True)
     # Foreign key
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
-    event_image = models.ForeignKey(Image, on_delete=models.SET_NULL, null=True, blank=True, related_name='event_images')
+    event_image = models.ForeignKey(Image, on_delete=models.SET_NULL, null=True, blank=True, related_name='event_image')
     # Many-to-many relations
     event_categories = models.ManyToManyField(Category, blank=True)
     event_tags = models.ManyToManyField(Tag, blank=True)

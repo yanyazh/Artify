@@ -51,7 +51,7 @@ class User(AbstractBaseUser):
     last_name = models.CharField(max_length=255)
     bio = models.TextField(blank=True)
     phone = models.CharField(max_length=15, blank=True)
-    profile_image = models.ForeignKey(Image, on_delete=models.SET_NULL, null=True, blank=True, related_name='user_profile_images')
+    profile_image = models.ForeignKey(Image, on_delete=models.SET_NULL, null=True, blank=True, related_name='user_profile_image')
 
     # Additional info
     is_active = models.BooleanField(default=True)
@@ -85,6 +85,12 @@ class User(AbstractBaseUser):
         "Is the user a member of staff?"
         # Simplest possible answer: All admins are staff
         return self.is_admin
+    
+    def follower_count(self):
+        return self.target.count()
+
+    def following_count(self):
+        return self.follower.count()
 
 
 class Follower(models.Model):
