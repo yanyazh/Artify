@@ -44,9 +44,10 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
 
     # Own apps
+    'misc.apps.MiscConfig', 
     'user.apps.UserConfig',
     'post.apps.PostConfig',
-    'event.apps.EventConfig'  # ,
+    'event.apps.EventConfig'# ,
     # 'auth.apps.AuthConfig'
 
 ]
@@ -151,7 +152,10 @@ EMAIL_USE_TLS = True
 
 STATIC_URL = 'static/'
 
+# Media folder for images 
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

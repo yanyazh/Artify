@@ -14,6 +14,7 @@ class UserModelAdmin(BaseUserAdmin):
         ("User Credentials", {"fields": ["email", "password"]}),
         ("Personal info", {"fields": ["name"]}),
         ("Permissions", {"fields": ["is_admin"]}),
+        ("Profile picture", {"fields": ["profile_image"]})
     ]
     # add_fieldsets is not a standard ModelAdmin attribute. UserModelAdmin
     # overrides get_fieldsets to use this attribute when creating a user.

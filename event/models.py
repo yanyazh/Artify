@@ -1,5 +1,5 @@
 from django.db import models
-from post.models import Category, Tag
+from misc.models import Category, Tag, Image
 from user.models import User
 
 # Create your models here.
@@ -11,6 +11,7 @@ class Event(models.Model):
     description = models.TextField(null=True)
     # Foreign key
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    event_image = models.ForeignKey(Image, on_delete=models.SET_NULL, null=True, blank=True, related_name='event_images')
     # Many-to-many relations
     event_categories = models.ManyToManyField(Category, blank=True)
     event_tags = models.ManyToManyField(Tag, blank=True)

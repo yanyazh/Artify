@@ -1,23 +1,9 @@
 from django.db import models
-from user.models import User
 from django.utils import timezone
 
+from user.models import User
+from misc.models import Category, Tag, Image
 # Create your models here.
-
-class Category(models.Model):
-    #Primary key implicit
-    category_name = models.CharField(max_length=64)
-
-    def __str__(self):
-        return self.category_name
-
-
-class Tag(models.Model):
-    #Primary key implicit
-    tag_name = models.CharField(max_length=64)
-
-    def __str__(self):
-        return self.tag_name
 
 
 class Post(models.Model):
@@ -29,6 +15,7 @@ class Post(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
     category_id = models.ForeignKey(Category, null=True, on_delete=models.SET_NULL)
     #Many-to-many relations
+    post_image = models.ForeignKey(Image, on_delete=models.SET_NULL, null=True, blank=True, related_name='post_images')
     post_tags = models.ManyToManyField(Tag, blank=True)
 
     def __str__(self):

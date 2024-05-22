@@ -3,6 +3,8 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
 
+from misc.models import Image
+
 # Create your models here.
 
 class UserManager(BaseUserManager):
@@ -38,12 +40,20 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser):
+    # Own info
     email = models.EmailField(
         verbose_name="Email",
         max_length=255,
         unique=True
     )
     name = models.CharField(max_length=255)
+    first_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+    bio = models.TextField(blank=True)
+    phone = models.CharField(max_length=15, blank=True)
+    profile_image = models.ForeignKey(Image, on_delete=models.SET_NULL, null=True, blank=True, related_name='user_profile_images')
+
+    # Additional info
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
