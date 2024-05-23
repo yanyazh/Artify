@@ -46,6 +46,7 @@ class User(AbstractBaseUser):
         max_length=255,
         unique=True
     )
+
     name = models.CharField(max_length=255)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
@@ -66,6 +67,9 @@ class User(AbstractBaseUser):
 
     def __str__(self):
         return self.email
+
+    def __int__(self):
+        return self.id
 
     def get_full_name(self):
         return self.name
