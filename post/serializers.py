@@ -16,3 +16,14 @@ class CommentSerializer(ModelSerializer):
         model = Comment
         fields = ('contents', 'publish_date', 'post_id', 'user_id')
         read_only_fields = ['user_id', 'post_id', 'publish_date']
+
+class LikeSerializer(ModelSerializer):
+    class Meta:
+        model = Like
+        fields = ('id', 'like_date', 'post_id', 'user_id')
+        # read_only_fields = ('like_date')
+
+class CreateLikeSerializer(ModelSerializer):
+    class Meta:
+        model = Like
+        fields = ('post_id')

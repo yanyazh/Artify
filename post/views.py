@@ -4,8 +4,8 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponse, JsonResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import Post, Comment
-from .serializers import PostSerializer, CommentSerializer
+from .models import Post, Comment, Like
+from .serializers import PostSerializer, CommentSerializer, LikeSerializer
 from user.models import User
 # Create your views here.
 
@@ -127,3 +127,27 @@ class CommentDeleteView(APIView):
         
         comment.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class CreateLikeView(APIView):
+    def post(self, request):
+        serializer = LikeSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class PostLikesView(APIView):
+    permission_classes = [AllowAny]
+    def get(self, request, post_id):
+        likes = Like.objects.filter(post_id=post_id)
+        liked_users = [
+            {
+                'id': like.user_id.id,
+                'email': like.user_id.email,
+                'name': like.user_id.name,
+                'first_name': like.user_id.first_name,
+                'last_name': like.user_id.last_name
+            }
+            for like in likes
+        ]
+        return JsonResponse({'liked_users': liked_users}, safe=False)
