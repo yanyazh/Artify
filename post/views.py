@@ -2,8 +2,8 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import Post
-from .serializers import PostSerializer
+from .models import Post, Comment
+from .serializers import PostSerializer, CommentSerializer
 
 # Create your views here.
 class PostView(APIView):
@@ -54,3 +54,28 @@ class FindPostView(APIView):
 
         return Response(PostSerializer(post).data)
 
+class CommentCreateView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, post_id):
+        post = Post.objects.get(id=post_id)
+        data = request.data.copy()
+        data['author'] = request.user.id
+        data['post'] = post.id
+        serializer = CommentSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class CommentDeleteView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, comment_id):
+        try:
+            comment = Comment.objects.get(id=comment_id, author=request.user)
+        except Comment.DoesNotExist:
+            return Response({"error": "Comment not found or not authorized"}, status=status.HTTP_404_NOT_FOUND)
+        
+        comment.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
