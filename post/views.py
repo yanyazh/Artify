@@ -7,6 +7,8 @@ from rest_framework.response import Response
 from .models import Post, Comment, Like
 from .serializers import PostSerializer, CommentSerializer, LikeSerializer
 from user.models import User
+from rest_framework.decorators import permission_classes
+
 # Create your views here.
 
 class UserCommentsView(APIView):
@@ -41,27 +43,17 @@ class PostCommentsView(APIView):
         comments = Comment.objects.filter(post_id=post.id)
         comments_data = list(comments.values('id', 'user_id', 'contents', 'publish_date'))
         
-        post_data = {
-            'id': post.id,
-            'title': post.title,
-            'description': post.description,
-            'publish_date': post.publish_date,
-            'user_id': post.user_id.id,
-            'category_id': post.category_id.id if post.category_id else None,
-            # 'post_images': [image.url for image in post.post_images.all()],
-            # 'post_tags': [tag.name for tag in post.post_tags.all()]
-        }
+      
         
-        return JsonResponse({'post': post_data, 'comments': comments_data}, safe=False)
+        return JsonResponse({'comments': comments_data}, safe=False)
 
 class PostView(APIView):
-    permission_classes = [AllowAny]
-
     def get(self, request):
         posts = Post.objects.all()
 
         return Response(PostSerializer(posts, many=True).data)
 
+    @permission_classes([IsAuthenticated])
     def post(self, request):
         serializer = PostSerializer(data=request.data)
 
